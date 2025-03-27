@@ -2,21 +2,8 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-
-import VegetablesImage from '../../assets/vegetables.jpg';
-import FruitsImage from '../../assets/fruits.jpg';
-import MeatsImage from '../../assets/meats.jpg';
-import FishesImage from '../../assets/fish.jpg';
-
-import SearchBar from './search-bar';
-
+import { categories } from './category-data';
 function CategoriesList() {
-  const categories = [
-    { name: 'Vegetables', image: VegetablesImage },
-    { name: 'Fruits', image: FruitsImage },
-    { name: 'Meats', image: MeatsImage },
-    { name: 'Fishes', image: FishesImage },
-  ];
 
   const cardStyle = {
     width: '100%',
@@ -55,10 +42,10 @@ function CategoriesList() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '20px', textTransform: 'uppercase' }}>categories</h2>
-      <Row className="g-4">
+      <h2 style={{ textAlign: 'left', marginBottom: '20px', textTransform: 'uppercase', fontSize: '24px' }}>featured categories</h2>
+      <Row xs={1} md={3} lg={6} className="g-3">
         {categories.map((category, index) => (
-          <Col key={index} xs={12} sm={6} md={3}>
+          <Col key={index}>
             <Card
               style={cardStyle}
               onMouseEnter={(e) => {

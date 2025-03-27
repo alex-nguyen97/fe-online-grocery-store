@@ -13,7 +13,7 @@ const AvatarDropdown = () => {
     return (
         <div className="d-flex align-items-center" style={{ paddingLeft: '12px' }}>
             {/* Avatar Image with dropdown toggle */}
-            <Dropdown drop={"down-centered"}>
+            <Dropdown drop={"down"}>
                 <Dropdown.Toggle
                     variant="link"
                     id="dropdown-avatar"

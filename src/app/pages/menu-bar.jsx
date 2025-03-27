@@ -9,29 +9,38 @@ const MenuBar = () => {
 
   return (
     <Navbar bg="light" expand="lg" sticky="top" className="shadow" style={{ paddingTop: '12px' }}>
-      <Container>
-        <Navbar.Brand href="#">My Website</Navbar.Brand>
-        <SearchBar />
-        <Navbar.Toggle aria-controls="navbarNav" />
-        <Navbar.Collapse id="navbarNav">
-          <Nav className="ms-auto">
-            <Nav.Link href="#" active>Shop</Nav.Link>
-            <Nav.Link href="#">Login</Nav.Link>
-            <Nav.Link href="#cart" className="position-relative">
-              <FaShoppingCart size={24} />
-              {cart.length > 0 && (
-                <Badge
-                  bg="danger"
-                  pill
-                  className="position-absolute top-0 start-100 translate-middle"
-                >
-                  {cart.length}
-                </Badge>
-              )}
-            </Nav.Link>
+      <Container fluid style={{ maxWidth: "100%", paddingLeft: "20px", paddingRight: "20px" }}>
+        {/* Navbar content in a flexbox */}
+        <div className="d-flex w-100 justify-content-between align-items-center">
+          {/* Left-aligned website name */}
+          <Navbar.Brand href="#" style={{ fontSize: '20px' }}>
+            My Website
+          </Navbar.Brand>
+
+          {/* Centered SearchBar */}
+          <SearchBar />
+
+          {/* Right-aligned navigation links */}
+          <div className="d-flex align-items-center">
+            <Nav className="d-flex">
+              <Nav.Link href="#" active>Shop</Nav.Link>
+              <Nav.Link href="#">Login</Nav.Link>
+              <Nav.Link href="#cart" className="position-relative">
+                <FaShoppingCart size={24} />
+                {cart.length > 0 && (
+                  <Badge
+                    bg="danger"
+                    pill
+                    className="position-absolute top-0 start-100 translate-middle"
+                  >
+                    {cart.length}
+                  </Badge>
+                )}
+              </Nav.Link>
+            </Nav>
             <PersonalAvatar />
-          </Nav>
-        </Navbar.Collapse>
+          </div>
+        </div>
       </Container>
     </Navbar>
   );

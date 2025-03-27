@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useState } from "react";
 import { Card, Button, Row, Col } from "react-bootstrap";
 import VegetablesImage from '../../assets/vegetables.jpg';
 
@@ -14,25 +14,53 @@ const products = [
 ];
 
 const ProductCardList = () => {
+
+    const [selectedCategory, setSelectedCategory] = useState("All");
+
+    const categories = ["All", "Meats", "Milk", "Vegetables"];
+
     return (
         <div style={{ padding: '20px' }}>
-            <h2 style={{ textAlign: 'center', marginBottom: '20px', textTransform: 'uppercase' }}>Products</h2>
-            <Row xs={1} md={2} lg={4}
-                className="g-4">
+            <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: '20px' }}>
+                <h2 style={{ textAlign: 'left', textTransform: 'uppercase', fontSize: '24px', margin: 0 }}>
+                    Products
+                </h2>
+                <div>
+                    {categories.map((category) => (
+                        <span
+                            key={category}
+                            onClick={() => setSelectedCategory(category)}
+                            style={{
+                                cursor: "pointer",
+                                marginLeft: "15px",
+                                fontSize: "16px",
+                                color: selectedCategory === category ? "green" : "black",
+                            }}
+                        >
+                            {category}
+                        </span>
+                    ))}
+                </div>
+            </div>
+            <Row xs={2} md={3} lg={5} className="g-3">
                 {products.map((product) => (
-                    <Col key={product.id}>
-                        <Card>
-                            <Card.Img variant="top" src={product.image} />
-                            <Card.Body>
+                    <Col key={product.id} className="d-flex justify-content-center">
+                        <Card style={{ width: "100%", maxWidth: "350px" }}> {/* Set max width */}
+                            <Card.Img
+                                variant="top"
+                                src={product.image}
+                                style={{ height: "350px", objectFit: "cover" }}
+                            /> {/* Reduce image size */}
+                            <Card.Body className="p-2"> {/* Reduce padding */}
                                 <Card.Title>{product.name}</Card.Title>
                                 <Card.Text>{product.price}</Card.Text>
-                                <Button variant="primary">Add to Cart</Button>
+                                <Button variant="primary" size="sm">Add to Cart</Button> {/* Smaller button */}
                             </Card.Body>
                         </Card>
                     </Col>
                 ))}
             </Row>
-        </div>
+        </div >
     );
 };
 
