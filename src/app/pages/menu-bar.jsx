@@ -10,17 +10,11 @@ const MenuBar = () => {
   return (
     <Navbar bg="light" expand="lg" sticky="top" className="shadow" style={{ paddingTop: '12px' }}>
       <Container fluid style={{ maxWidth: "100%", paddingLeft: "20px", paddingRight: "20px" }}>
-        {/* Navbar content in a flexbox */}
         <div className="d-flex w-100 justify-content-between align-items-center">
-          {/* Left-aligned website name */}
           <Navbar.Brand href="#" style={{ fontSize: '20px' }}>
             My Website
           </Navbar.Brand>
-
-          {/* Centered SearchBar */}
           <SearchBar />
-
-          {/* Right-aligned navigation links */}
           <div className="d-flex align-items-center">
             <Nav className="d-flex">
               <Nav.Link href="#" active>Shop</Nav.Link>

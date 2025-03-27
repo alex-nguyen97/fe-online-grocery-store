@@ -1,7 +1,8 @@
-import { React, useState } from "react";
+import { React } from "react";
 import { Card, Button, Row, Col } from "react-bootstrap";
+import { useSelector, useDispatch } from 'react-redux';
 import VegetablesImage from '../../assets/vegetables.jpg';
-
+import { defaultSubCategory, setSelectedSubCategory } from "../storeSlice";
 const products = [
     { id: 1, name: "Product 1", price: "$10", image: VegetablesImage },
     { id: 2, name: "Product 2", price: "$20", image: VegetablesImage },
@@ -15,9 +16,22 @@ const products = [
 
 const ProductCardList = () => {
 
-    const [selectedCategory, setSelectedCategory] = useState("All");
+    // Add all as a default subcategory
+    const subCategories = useSelector((state) => {
+        const selectedCategory = state.store.selectedCategory;
+        const subCategoryList = selectedCategory ? selectedCategory.subcategories : [];
+        return selectedCategory ? [defaultSubCategory, ...subCategoryList] : [defaultSubCategory];
+    });
 
-    const categories = ["All", "Meats", "Milk", "Vegetables"];
+    const selectedSubCategory = useSelector((state) => {
+        return state.store.selectedSubcategory;
+    });
+
+    const dispatch = useDispatch();
+
+    const handleSelectSubCategory = (subCategory) => {
+        dispatch(setSelectedSubCategory(subCategory));
+    };
 
     return (
         <div style={{ padding: '20px' }}>
@@ -26,35 +40,37 @@ const ProductCardList = () => {
                     Products
                 </h2>
                 <div>
-                    {categories.map((category) => (
-                        <span
-                            key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            style={{
-                                cursor: "pointer",
-                                marginLeft: "15px",
-                                fontSize: "16px",
-                                color: selectedCategory === category ? "green" : "black",
-                            }}
-                        >
-                            {category}
-                        </span>
-                    ))}
+                    {subCategories?.map((subCategory) => {
+                        return (
+                            <span
+                                key={subCategory.name}
+                                onClick={() => handleSelectSubCategory(subCategory)}
+                                style={{
+                                    cursor: "pointer",
+                                    marginLeft: "15px",
+                                    fontSize: "16px",
+                                    color: selectedSubCategory?.name === subCategory.name ? "green" : "black",
+                                }}
+                            >
+                                {subCategory.name}
+                            </span>
+                        )
+                    })}
                 </div>
             </div>
             <Row xs={2} md={3} lg={5} className="g-3">
                 {products.map((product) => (
                     <Col key={product.id} className="d-flex justify-content-center">
-                        <Card style={{ width: "100%", maxWidth: "350px" }}> {/* Set max width */}
+                        <Card style={{ width: "100%", maxWidth: "350px" }}>
                             <Card.Img
                                 variant="top"
                                 src={product.image}
                                 style={{ height: "350px", objectFit: "cover" }}
-                            /> {/* Reduce image size */}
-                            <Card.Body className="p-2"> {/* Reduce padding */}
+                            />
+                            <Card.Body className="p-2">
                                 <Card.Title>{product.name}</Card.Title>
                                 <Card.Text>{product.price}</Card.Text>
-                                <Button variant="primary" size="sm">Add to Cart</Button> {/* Smaller button */}
+                                <Button variant="primary" size="sm">Add to Cart</Button>
                             </Card.Body>
                         </Card>
                     </Col>

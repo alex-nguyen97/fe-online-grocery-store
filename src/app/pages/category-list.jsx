@@ -2,7 +2,9 @@ import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { categories } from './category-data';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSelectedCategory } from '../storeSlice';
+
 function CategoriesList() {
 
   const cardStyle = {
@@ -40,6 +42,16 @@ function CategoriesList() {
     transition: 'opacity 0.3s ease',
   }
 
+  const categories = useSelector((state) => {
+    return state.store.categories;
+  });
+
+  const dispatch = useDispatch();
+
+  const handleSelectCategory = (category) => {
+    dispatch(setSelectedCategory(category));
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <h2 style={{ textAlign: 'left', marginBottom: '20px', textTransform: 'uppercase', fontSize: '24px' }}>featured categories</h2>
@@ -54,6 +66,7 @@ function CategoriesList() {
               onMouseLeave={(e) => {
                 e.currentTarget.querySelector('img').style.opacity = '1'; // Restore opacity on hover out
               }}
+              onClick={() => handleSelectCategory(category)}
             >
               <Card.Img variant="top" src={category.image} style={imageStyle} />
               <Card.ImgOverlay style={overlayStyle}>
