@@ -7,7 +7,7 @@ const SearchBar = () => {
         <div className="d-flex justify-content-center" style={{ width: '100%' }}>
             <InputGroup style={{ width: '60%', borderRadius: '50px', overflow: 'hidden' }}>
                 <Form.Control
-                    placeholder="Search..."
+                    placeholder="Search by product name..."
                     aria-label="Search"
                     style={{ borderRadius: '50px' }}
                 />

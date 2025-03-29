@@ -1,10 +1,11 @@
 import { React, useState } from 'react';
-import { Navbar, Nav, Container, Badge, Button } from 'react-bootstrap';
+import { Navbar, Nav, Container, Badge, Image } from 'react-bootstrap';
 import PersonalAvatar from './personal-avatar';
 import { FaShoppingCart } from "react-icons/fa";
 import SearchBar from './search-bar';
 import { useDispatch } from 'react-redux';
 import { setShoppingCartToggle } from '../storeSlice';
+import Logo from '../../assets/logo.avif';
 
 const MenuBar = () => {
   const [cart, setCart] = useState([1, 2, 3, 4, 5]);
@@ -27,8 +28,13 @@ const MenuBar = () => {
     <Navbar bg="light" expand="lg" sticky="top" className="shadow" style={{ paddingTop: '12px' }}>
       <Container fluid style={{ maxWidth: "100%", paddingLeft: "20px", paddingRight: "20px" }}>
         <div className="d-flex w-100 justify-content-between align-items-center">
+          <Image
+            src={Logo}
+            style={{ width: '50px', height: '50px', marginLeft: '10px' }}
+            alt="Logo"
+          />
           <Navbar.Brand href="#" style={{ fontSize: '20px' }}>
-            My Website
+            Shop Grocery
           </Navbar.Brand>
           <SearchBar />
           <div className="d-flex align-items-center">

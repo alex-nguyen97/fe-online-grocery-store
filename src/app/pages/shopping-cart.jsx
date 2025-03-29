@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
 import { useSelector, useDispatch } from 'react-redux';
 import { setShoppingCartToggle } from "../storeSlice";
 
 const ShoppingCart = () => {
-    const [cart, setCart] = useState([]);
+    const shoppingCart = useSelector((state) => { return state.store.shoppingCart });
     const isShoppingCartOpen = useSelector((state) => { return state.store.isShoppingCartOpen });
-    useEffect(() => {
-        const savedCart = JSON.parse(localStorage.getItem("shoppingCart"));
-        if (savedCart) {
-            setCart(savedCart);
-        }
-    }, []);
+    // useEffect(() => {
+    //     const savedCart = JSON.parse(localStorage.getItem("shoppingCart"));
+    //     if (savedCart) {
+    //         setCart(savedCart);
+    //     }
+    // }, []);
 
-    useEffect(() => {
-        localStorage.setItem("shoppingCart", JSON.stringify(cart));
-        const timeout = setTimeout(() => {
-            localStorage.removeItem("shoppingCart");
-        }, 20 * 60 * 1000); // 20 minutes
-        return () => clearTimeout(timeout);
-    }, [cart]);
+    // useEffect(() => {
+    //     localStorage.setItem("shoppingCart", JSON.stringify(cart));
+    //     const timeout = setTimeout(() => {
+    //         localStorage.removeItem("shoppingCart");
+    //     }, 20 * 60 * 1000); // 20 minutes
+    //     return () => clearTimeout(timeout);
+    // }, [cart]);
 
     const updateQuantity = (index, quantity) => {
         if (quantity < 1) return;
@@ -35,7 +35,7 @@ const ShoppingCart = () => {
 
     const clearCart = () => setCart([]);
 
-    const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const totalPrice = shoppingCart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
     const dispatch = useDispatch();
     const handleCloseShoppingCart = () => {
@@ -44,13 +44,13 @@ const ShoppingCart = () => {
 
     return (
         <div>
-            <Modal show={isShoppingCartOpen} onHide={handleCloseShoppingCart}>
+            <Modal show={isShoppingCartOpen} onHide={handleCloseShoppingCart} style={{ width: '100%', minWidth: '1000px' }}>
                 <Modal.Header closeButton>
                     <Modal.Title>Shopping Cart</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    {cart.length > 0 ? (
-                        <Table striped bordered hover>
+                <Modal.Body style={{ overflowX: 'auto' }}>
+                    {shoppingCart.length > 0 ? (
+                        <Table striped bordered hover responsive="sm" style={{ maxWidth: '100%', width: '100%', tableLayout: 'fixed', overflowX: 'auto' }}>
                             <thead>
                                 <tr>
                                     <th>Item</th>
@@ -61,26 +61,29 @@ const ShoppingCart = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {cart.map((item, index) => (
-                                    <tr key={index}>
-                                        <td>{item.name}</td>
-                                        <td>${item.price.toFixed(2)}</td>
-                                        <td>
-                                            <input
-                                                type="number"
-                                                value={item.quantity}
-                                                onChange={(e) => updateQuantity(index, parseInt(e.target.value))}
-                                                min="1"
-                                            />
-                                        </td>
-                                        <td>${(item.price * item.quantity).toFixed(2)}</td>
-                                        <td>
-                                            <Button variant="danger" onClick={() => removeItem(index)}>
-                                                Remove
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {shoppingCart?.map((item, index) => {
+                                    return (
+                                        <tr key={index}>
+                                            <td>{item.name}</td>
+                                            <td>${item.price.toFixed(2)}</td>
+                                            <td>
+                                                <input
+                                                    style={{ width: '60px', textAlign: 'center' }}
+                                                    type="number"
+                                                    value={item.cartQuantity}
+                                                    onChange={(e) => updateQuantity(index, parseInt(e.target.value))}
+                                                    min="1"
+                                                />
+                                            </td>
+                                            <td>${(item.price * item.cartQuantity).toFixed(2)}</td>
+                                            <td style={{ textAlign: 'center' }}>
+                                                <Button variant="danger" onClick={() => removeItem(index)} style={{ width: '100%', padding: '5px' }}>
+                                                    Remove
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
                             </tbody>
                         </Table>
                     ) : (
@@ -89,8 +92,8 @@ const ShoppingCart = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseShoppingCart}>Close</Button>
-                    <Button variant="warning" onClick={clearCart} disabled={cart.length === 0}>Clear Cart</Button>
-                    <Button variant="success" disabled={cart.length === 0}>Order (${totalPrice.toFixed(2)})</Button>
+                    <Button variant="warning" onClick={clearCart} disabled={shoppingCart.length === 0}>Clear Cart</Button>
+                    <Button variant="success" disabled={shoppingCart.length === 0}>Order (${totalPrice.toFixed(2)})</Button>
                 </Modal.Footer>
             </Modal>
         </div>

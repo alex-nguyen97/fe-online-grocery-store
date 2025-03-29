@@ -8,6 +8,7 @@ const initialState = {
     selectedSubcategory: defaultSubCategory,
     isShoppingCartOpen: false,
     isDeliveryDetailOpen: false,
+    shoppingCart: [],
 };
 
 const storeSlice = createSlice({
@@ -26,8 +27,11 @@ const storeSlice = createSlice({
         setShoppingCartToggle: (state, action) => {
             state.isShoppingCartOpen = action.payload;
         },
+        setShoppingCart: (state, action) => {
+            state.shoppingCart = action.payload;
+        },
     }
 });
 
-export const { setCategories, setSelectedCategory, setSelectedSubCategory, setShoppingCartToggle } = storeSlice.actions;
+export const { setCategories, setSelectedCategory, setSelectedSubCategory, setShoppingCartToggle, setShoppingCart } = storeSlice.actions;
 export default storeSlice.reducer;

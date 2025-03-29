@@ -27,8 +27,7 @@ const AvatarDropdown = () => {
                         height="40"
                     />
                 </Dropdown.Toggle>
-
-                <Dropdown.Menu style={{ padding: 0 }} className="text-center" >
+                <Dropdown.Menu style={{ padding: 0, left: '-100px' }} className="text-center">
                     <Dropdown.ItemText style={{ padding: "10px" }}>{name}</Dropdown.ItemText>
                     <Dropdown.Divider style={{ padding: 0, margin: 0 }} />
                     <Dropdown.Item style={{ padding: "10px" }} onClick={handleLogout}>Logout</Dropdown.Item>
