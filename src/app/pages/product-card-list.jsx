@@ -104,12 +104,6 @@ const ProductCardList = () => {
                                     variant={product.quantity === 0 ? "secondary" : "primary"}
                                     size="sm"
                                     disabled={product.quantity === 0}
-                                    style={{
-                                        backgroundColor: product.quantity === 0 ? "#d3d3d3" : "", // Light gray when disabled
-                                        borderColor: product.quantity === 0 ? "#a9a9a9" : "", // Darker border for contrast
-                                        color: product.quantity === 0 ? "#6c757d" : "", // Muted text color
-                                        cursor: product.quantity === 0 ? "not-allowed" : "pointer", // Show "not-allowed" cursor when disabled
-                                    }}
                                     onClick={() => handleAddToCart(product)}
                                 >
                                     Add to Cart
@@ -122,7 +116,7 @@ const ProductCardList = () => {
             <ToastNotification
                 message="Product added to cart!"
                 showToast={showToast}
-                position="top-end"
+                position="bottom-end"
                 onClose={() => setShowToast(false)}
             />
         </div >

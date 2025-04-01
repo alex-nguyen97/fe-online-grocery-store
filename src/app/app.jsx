@@ -13,11 +13,7 @@ function App() {
       <CategoriesList />
       <ProductCardList />
       <ShoppingCart />
-      <DeliveryDetail
-        showModal={false}
-        handleClose={() => { }}
-        handleSubmitOrder={() => { }}
-      />
+      <DeliveryDetail />
     </div>
 
   )

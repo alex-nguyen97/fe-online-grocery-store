@@ -3,12 +3,11 @@ import { Navbar, Nav, Container, Badge, Image } from 'react-bootstrap';
 import PersonalAvatar from './personal-avatar';
 import { FaShoppingCart } from "react-icons/fa";
 import SearchBar from './search-bar';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { setShoppingCartToggle } from '../storeSlice';
 import Logo from '../../assets/logo.avif';
 
 const MenuBar = () => {
-  const [cart, setCart] = useState([1, 2, 3, 4, 5]);
   const [hover, setHover] = useState(false);
 
   const cartIconStyle = {
@@ -24,6 +23,11 @@ const MenuBar = () => {
   const handleOpenShoppingCart = () => {
     dispatch(setShoppingCartToggle(true));
   }
+
+  const cartList = useSelector((state) => {
+    return state.store.shoppingCart;
+  })
+
   return (
     <Navbar bg="light" expand="lg" sticky="top" className="shadow" style={{ paddingTop: '12px' }}>
       <Container fluid style={{ maxWidth: "100%", paddingLeft: "20px", paddingRight: "20px" }}>
@@ -45,13 +49,13 @@ const MenuBar = () => {
                 <FaShoppingCart size={24} className="ms-2" style={hover ? { ...cartIconStyle, ...cartIconHoverStyle } : cartIconStyle}
                   onMouseEnter={() => setHover(true)}
                   onMouseLeave={() => setHover(false)} />
-                {cart.length > 0 && (
+                {cartList.length > 0 && (
                   <Badge
                     bg="danger"
                     pill
                     className="position-absolute top-0 start-100 translate-middle"
                   >
-                    {cart.length}
+                    {cartList.length}
                   </Badge>
                 )}
               </div>

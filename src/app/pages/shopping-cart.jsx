@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
 import { useSelector, useDispatch } from 'react-redux';
-import { setShoppingCartToggle } from "../storeSlice";
+import { setDeliveryDetailToggle, setShoppingCart, setShoppingCartToggle } from "../storeSlice";
+import ToastNotification from "./toast-notification";
 
 const ShoppingCart = () => {
     const shoppingCart = useSelector((state) => { return state.store.shoppingCart });
@@ -33,13 +34,26 @@ const ShoppingCart = () => {
         setCart(newCart);
     };
 
-    const clearCart = () => setCart([]);
-
     const totalPrice = shoppingCart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
     const dispatch = useDispatch();
     const handleCloseShoppingCart = () => {
         dispatch(setShoppingCartToggle(false));
+    }
+
+    const clearCart = () => {
+        setToastMessage("Cart cleared successfully!");
+        setShowToast(true);
+        dispatch(setShoppingCart([]))
+    };
+
+    const isCartEmpty = shoppingCart.length === 0;
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+
+    const handleOrderProducts = () => {
+        dispatch(setShoppingCartToggle(false));
+        dispatch(setDeliveryDetailToggle(true));
     }
 
     return (
@@ -91,11 +105,27 @@ const ShoppingCart = () => {
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleCloseShoppingCart}>Close</Button>
-                    <Button variant="warning" onClick={clearCart} disabled={shoppingCart.length === 0}>Clear Cart</Button>
-                    <Button variant="success" disabled={shoppingCart.length === 0}>Order (${totalPrice.toFixed(2)})</Button>
+                    <Button
+                        variant="warning"
+                        onClick={clearCart}
+                        disabled={isCartEmpty}>
+                        Clear Cart
+                    </Button>
+
+                    <Button
+                        variant="success"
+                        disabled={isCartEmpty}
+                        onClick={handleOrderProducts}>
+                        Order (${totalPrice.toFixed(2)})
+                    </Button>
                 </Modal.Footer>
             </Modal>
+            <ToastNotification
+                message={toastMessage}
+                showToast={showToast}
+                position="bottom-end"
+                onClose={() => setShowToast(false)}
+            />
         </div>
     );
 };

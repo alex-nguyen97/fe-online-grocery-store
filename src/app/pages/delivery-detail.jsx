@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Modal, Form, Button, Alert } from 'react-bootstrap';
+import { useSelector, useDispatch } from 'react-redux';
+import { setDeliveryDetailToggle, setShoppingCartToggle } from '../storeSlice';
 
-const DeliveryDetail = ({ showModal, handleClose, handleSubmitOrder }) => {
+const DeliveryDetail = ({ handleClose, handleSubmitOrder }) => {
+
     const [formData, setFormData] = useState({
         recipientName: '',
         address: '',
@@ -62,6 +65,18 @@ const DeliveryDetail = ({ showModal, handleClose, handleSubmitOrder }) => {
         }
     };
 
+    const showModal = useSelector((state) => {
+        return state.store.isDeliveryDetailOpen;
+    });
+
+    const dispatch = useDispatch();
+    const handleCloseModal = () => {
+        dispatch(setDeliveryDetailToggle(false));
+    }
+    const handleBackToCart = () => {
+        handleCloseModal();
+        dispatch(setShoppingCartToggle(true));
+    }
     return (
         <Modal show={showModal} onHide={handleClose}>
             <Modal.Header closeButton>
@@ -178,7 +193,7 @@ const DeliveryDetail = ({ showModal, handleClose, handleSubmitOrder }) => {
 
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => { }}>Close</Button>
-                <Button variant="warning" onClick={() => { }}>Back to Cart</Button>
+                <Button variant="warning" onClick={() => handleBackToCart()}>Back to Cart</Button>
                 <Button variant="success" type='submit'>Submit Order</Button>
             </Modal.Footer>
         </Modal>
