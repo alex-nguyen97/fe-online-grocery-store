@@ -86,7 +86,7 @@ const ProductCardList = () => {
             <Row xs={2} md={3} lg={5} className="g-3">
                 {products.map((product) => (
                     <Col key={product.id} className="d-flex justify-content-center">
-                        <Card style={{ width: "100%", maxWidth: "350px" }}>
+                        <Card className="card-hover" style={{ width: "100%", maxWidth: "350px" }}>
                             <Card.Img
                                 variant="top"
                                 src={product.image}

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, Form, Button, Alert } from 'react-bootstrap';
+import { Modal, Form, Button } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { setDeliveryDetailToggle, setShoppingCartToggle } from '../storeSlice';
+import { setDeliveryDetailToggle, setShoppingCart, setShoppingCartToggle } from '../storeSlice';
+import ToastNotification from './toast-notification';
 
-const DeliveryDetail = ({ handleClose, handleSubmitOrder }) => {
+const DeliveryDetail = () => {
 
     const [formData, setFormData] = useState({
         recipientName: '',
@@ -14,7 +15,6 @@ const DeliveryDetail = ({ handleClose, handleSubmitOrder }) => {
         email: '',
     });
     const [errors, setErrors] = useState({});
-    const [errorMessage, setErrorMessage] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -30,8 +30,11 @@ const DeliveryDetail = ({ handleClose, handleSubmitOrder }) => {
 
         // Validate required fields
         Object.keys(formData).forEach((key) => {
+            const formattedKey = key
+                .replace(/([A-Z])/g, ' $1')   // Add space before capital letters
+                .replace(/^./, str => str.toUpperCase()); // Capitalize first letter
             if (!formData[key]) {
-                formErrors[key] = `${key} is required`;
+                formErrors[key] = `${formattedKey} is required`;
                 isValid = false;
             }
         });
@@ -54,14 +57,29 @@ const DeliveryDetail = ({ handleClose, handleSubmitOrder }) => {
         return isValid;
     };
 
+    const [toast, setToast] = useState({
+        show: false,
+        message: '',
+        background: 'success',
+    });
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         if (validateForm()) {
-            // Assuming there's a function to handle order submission
-            handleSubmitOrder(formData);
+            setToast({
+                show: true,
+                message: "Order confirmed! A confirmation email has been sent.",
+                background: 'success',
+            });
+            dispatch(setShoppingCart([])); // Clear the shopping cart
+            dispatch(setDeliveryDetailToggle(false)); // Close the modal
         } else {
-            setErrorMessage('Please fill out all fields correctly');
+            setToast({
+                show: true,
+                message: "Order submission failed! Please check your details.",
+                background: 'danger',
+            });
         }
     };
 
@@ -77,15 +95,27 @@ const DeliveryDetail = ({ handleClose, handleSubmitOrder }) => {
         handleCloseModal();
         dispatch(setShoppingCartToggle(true));
     }
-    return (
-        <Modal show={showModal} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Delivery Details</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
 
-                <Form onSubmit={handleSubmit}>
+    const states = [
+        { value: "", label: "Select a state" },
+        { value: "NSW", label: "New South Wales" },
+        { value: "VIC", label: "Victoria" },
+        { value: "QLD", label: "Queensland" },
+        { value: "WA", label: "Western Australia" },
+        { value: "SA", label: "South Australia" },
+        { value: "TAS", label: "Tasmania" },
+        { value: "ACT", label: "Australian Capital Territory" },
+        { value: "NT", label: "Northern Territory" },
+        { value: "Other", label: "Other" },
+    ];
+
+    return (
+        <Modal show={showModal} onHide={handleCloseModal}>
+            <Form onSubmit={handleSubmit} noValidate>
+                <Modal.Header closeButton>
+                    <Modal.Title>Delivery Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
                     <Form.Group controlId="recipientName">
                         <Form.Label>Recipient's Name</Form.Label>
                         <Form.Control
@@ -141,16 +171,11 @@ const DeliveryDetail = ({ handleClose, handleSubmitOrder }) => {
                             isInvalid={!!errors.state}
                             required
                         >
-                            <option value="">Select a state</option>
-                            <option value="NSW">New South Wales</option>
-                            <option value="VIC">Victoria</option>
-                            <option value="QLD">Queensland</option>
-                            <option value="WA">Western Australia</option>
-                            <option value="SA">South Australia</option>
-                            <option value="TAS">Tasmania</option>
-                            <option value="ACT">Australian Capital Territory</option>
-                            <option value="NT">Northern Territory</option>
-                            <option value="Other">Other</option>
+                            {states.map((state) => (
+                                <option key={state.value} value={state.value}>
+                                    {state.label}
+                                </option>
+                            ))}
                         </Form.Control>
                         <Form.Control.Feedback type="invalid">
                             {errors.state}
@@ -188,14 +213,25 @@ const DeliveryDetail = ({ handleClose, handleSubmitOrder }) => {
                             {errors.email}
                         </Form.Control.Feedback>
                     </Form.Group>
-                </Form>
-            </Modal.Body>
 
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => { }}>Close</Button>
-                <Button variant="warning" onClick={() => handleBackToCart()}>Back to Cart</Button>
-                <Button variant="success" type='submit'>Submit Order</Button>
-            </Modal.Footer>
+                </Modal.Body>
+
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => { }}>Close</Button>
+                    <Button variant="warning" onClick={() => handleBackToCart()}>Back to Cart</Button>
+                    <Button variant="success" type="submit">
+                        Submit Order
+                    </Button>
+                </Modal.Footer>
+            </Form>
+
+            <ToastNotification
+                message={toast.message}
+                showToast={toast.show}
+                background={toast.background}
+                position="bottom-end"
+                onClose={() => setShowToast(false)}
+            />
         </Modal>
     );
 };
