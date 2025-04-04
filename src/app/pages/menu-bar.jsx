@@ -37,14 +37,14 @@ const MenuBar = () => {
             style={{ width: '50px', height: '50px', marginLeft: '10px' }}
             alt="Logo"
           />
-          <Navbar.Brand href="#" style={{ fontSize: '20px' }}>
+          <Navbar.Brand href="/" style={{ fontSize: '20px' }}>
             Shop Grocery
           </Navbar.Brand>
           <SearchBar />
           <div className="d-flex align-items-center">
             <Nav className="d-flex">
-              <Nav.Link href="#" active>Shop</Nav.Link>
-              <Nav.Link href="#">Login</Nav.Link>
+              <Nav.Link href="/" active>Shop</Nav.Link>
+              <Nav.Link href="/">Login</Nav.Link>
               <div className="position-relative d-flex align-items-center" style={{ cursor: "pointer" }} onClick={handleOpenShoppingCart}>
                 <FaShoppingCart size={24} className="ms-2" style={hover ? { ...cartIconStyle, ...cartIconHoverStyle } : cartIconStyle}
                   onMouseEnter={() => setHover(true)}

@@ -46,11 +46,22 @@ function CategoriesList() {
     return state.store.categories;
   });
 
+  const selectedCategory = useSelector((state) => {
+    return state.store.selectedCategory;
+  });
+
   const dispatch = useDispatch();
 
   const handleSelectCategory = (category) => {
     dispatch(setSelectedCategory(category));
   };
+
+  const getCardStyle = (category) => {
+    return ({
+      opacity: selectedCategory.name === category.name ? 1 : 0.7,
+      boxShadow: selectedCategory.name === category.name ? "0 0 10px rgba(0, 123, 255, 0.5)" : "none",
+    });
+  }
 
   return (
     <div style={{ padding: '20px' }}>
@@ -59,13 +70,8 @@ function CategoriesList() {
         {categories.map((category, index) => (
           <Col key={index}>
             <Card
-              style={cardStyle}
-              onMouseEnter={(e) => {
-                e.currentTarget.querySelector('img').style.opacity = '0.7'; // Reduce opacity on hover
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.querySelector('img').style.opacity = '1'; // Restore opacity on hover out
-              }}
+              className='category-card'
+              style={getCardStyle(category)}
               onClick={() => handleSelectCategory(category)}
             >
               <Card.Img variant="top" src={category.image} style={imageStyle} />
