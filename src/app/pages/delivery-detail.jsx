@@ -191,7 +191,6 @@ const DeliveryDetail = () => {
                             onChange={handleChange}
                             isInvalid={!!errors.mobileNumber}
                             required
-                            pattern="^\d{10}$"
                             placeholder="e.g. 0412345678"
                         />
                         <Form.Control.Feedback type="invalid">

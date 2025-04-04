@@ -39,7 +39,12 @@ const ProductCardList = () => {
         return state.store.shoppingCart;
     });
 
-    const [showToast, setShowToast] = useState(false);
+    const [toast, setToast] = useState({
+        message: "Product added to cart!",
+        showToast: false,
+        background: "success",
+    });
+
     const handleAddToCart = (product) => {
         if (product.quantity === 0) return; // Prevent adding out-of-stock items
 
@@ -47,15 +52,34 @@ const ProductCardList = () => {
         const existingProduct = shoppingCart.find((item) => item.id === product.id);
 
         if (existingProduct) {
-            // Increment quantity if product is already in cart
-            dispatch(setShoppingCart(shoppingCart.map(item =>
-                item.id === product.id ? { ...item, cartQuantity: item.cartQuantity + 1 } : item
-            )));
+            if (existingProduct.cartQuantity < product.quantity) {
+                // Increment quantity if product is already in cart
+                dispatch(setShoppingCart(shoppingCart.map(item =>
+                    item.id === product.id ? { ...item, cartQuantity: item.cartQuantity + 1 } : item
+                )));
+                setToast({
+                    message: "Product quantity updated in cart!",
+                    showToast: true,
+                    background: "success",
+                });
+            } else {
+                // Prevent adding more than available quantity
+                setToast({
+                    message: "You have reached the maximum quantity for this product!",
+                    showToast: true,
+                    background: "danger",
+                });
+            }
         } else {
             // Add product to cart with initial quantity 1
             dispatch(setShoppingCart([...shoppingCart, { ...product, cartQuantity: 1 }]));
+            setToast({
+                message: "Product added to cart!",
+                showToast: true,
+                background: "success",
+            });
         }
-        setShowToast(true);
+
     };
 
     return (
@@ -114,10 +138,16 @@ const ProductCardList = () => {
                 ))}
             </Row>
             <ToastNotification
-                message="Product added to cart!"
-                showToast={showToast}
+                message={toast.message}
+                showToast={toast.showToast}
+                background={toast.background}
                 position="bottom-end"
-                onClose={() => setShowToast(false)}
+                onClose={() => setToast(
+                    {
+                        ...toast,
+                        showToast: false
+                    }
+                )}
             />
         </div >
     );
