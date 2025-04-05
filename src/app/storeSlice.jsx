@@ -3,8 +3,8 @@ import { categories } from './pages/category-data';
 export const defaultSubCategory = { name: 'All' };
 
 const initialState = {
-    categories: categories,
-    selectedCategory: categories[0],
+    categories: [],
+    selectedCategory: {},
     selectedSubcategory: defaultSubCategory,
     isShoppingCartOpen: false,
     isDeliveryDetailOpen: false,

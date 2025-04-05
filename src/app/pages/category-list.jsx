@@ -1,9 +1,10 @@
-import React from 'react';
+import { React, useEffect } from 'react';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSelectedCategory } from '../storeSlice';
+import { setSelectedCategory, setCategories } from '../storeSlice';
+import api from '../../api';
 
 function CategoriesList() {
 
@@ -42,10 +43,6 @@ function CategoriesList() {
     transition: 'opacity 0.3s ease',
   }
 
-  const categories = useSelector((state) => {
-    return state.store.categories;
-  });
-
   const selectedCategory = useSelector((state) => {
     return state.store.selectedCategory;
   });
@@ -63,26 +60,44 @@ function CategoriesList() {
     });
   }
 
+  useEffect(() => {
+    // Make the API call using the global api instance
+    api.get('/categories')
+      .then((response) => {
+        console.log(response.data);
+        dispatch(setCategories(response.data));
+      })
+      .catch((error) => {
+        setError('Error fetching categories.');
+      });
+  }, []);
+
+  const categories = useSelector((state) => {
+    return state.store.categories;
+  });
+
   return (
     <div style={{ padding: '20px' }}>
       <h2 style={{ textAlign: 'left', marginBottom: '20px', textTransform: 'uppercase', fontSize: '24px' }}>featured categories</h2>
       <Row xs={1} md={3} lg={6} className="g-3">
-        {categories.map((category, index) => (
-          <Col key={index}>
-            <Card
-              className='category-card'
-              style={getCardStyle(category)}
-              onClick={() => handleSelectCategory(category)}
-            >
-              <Card.Img variant="top" src={category.image} style={imageStyle} />
-              <Card.ImgOverlay style={overlayStyle}>
-                <Card.Title style={cardTitleStyle}>
-                  {category.name}
-                </Card.Title>
-              </Card.ImgOverlay>
-            </Card>
-          </Col>
-        ))}
+        {categories?.map((category, index) => {
+          return (
+            <Col key={index}>
+              <Card
+                className='category-card'
+                style={getCardStyle(category)}
+                onClick={() => handleSelectCategory(category)}
+              >
+                <Card.Img variant="top" src={`/src/assets/${category.image}`} style={imageStyle} />
+                <Card.ImgOverlay style={overlayStyle}>
+                  <Card.Title style={cardTitleStyle}>
+                    {category.category_name}
+                  </Card.Title>
+                </Card.ImgOverlay>
+              </Card>
+            </Col>
+          )
+        })}
       </Row>
     </div>
   );

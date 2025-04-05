@@ -11,7 +11,7 @@ function App() {
     <div>
       <MenuBar />
       <CategoriesList />
-      <ProductCardList />
+      {/* <ProductCardList /> */}
       <ShoppingCart />
       <DeliveryDetail />
     </div>
