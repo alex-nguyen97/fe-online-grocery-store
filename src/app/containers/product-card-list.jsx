@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { defaultSubCategory, setProducts, setSelectedSubCategory, setShoppingCart } from "../storeSlice";
 import ToastNotification from "./toast-notification";
 import api from "../../api";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 const ProductCardList = () => {
 
@@ -30,35 +31,54 @@ const ProductCardList = () => {
         return state.store.shoppingCart;
     });
 
+
     const [toast, setToast] = useState({
         message: "Product added to cart!",
         showToast: false,
         background: "success",
     });
 
+    const [searchParams] = useSearchParams();
+    const searchKey = searchParams.get('search');
+
+    const [error, setError] = useState(null);
     useEffect(() => {
         // Make the API call using the global api instance
         let params = {}
-        if (selectedSubCategory === defaultSubCategory) {
+        if (searchKey) {
+            console.log("searchKey", searchKey);
             params = {
-                category: selectedCategory.category_id,
+                search: searchKey,
             }
         }
         else {
-            params = {
-                sub_category: selectedSubCategory.sub_category_id,
+            if (selectedSubCategory === defaultSubCategory) {
+                params = {
+                    category: selectedCategory.category_id,
+                }
+            }
+            else {
+                params = {
+                    sub_category: selectedSubCategory.sub_category_id,
+                }
             }
         }
         api.get('/products', {
             params: params
         })
             .then((response) => {
+                setError(null);
                 dispatch(setProducts(response.data));
             })
             .catch((error) => {
-                // setError('Error fetching products.');
+                dispatch(setProducts([]));
+                if (error.response && error.response.status === 404) {
+                    setError("Sorry, we couldn't find results for your search.");
+                } else {
+                    setError("Error fetching products.");
+                }
             });
-    }, [selectedCategory, selectedSubCategory]);
+    }, [selectedCategory, selectedSubCategory, searchKey]);
 
     const products = useSelector((state) => {
         return state.store.products;
@@ -68,10 +88,10 @@ const ProductCardList = () => {
         if (product.quantity === 0) return; // Prevent adding out-of-stock items
 
         // Check if the product is already in the cart
-        const existingProduct = shoppingCart.find((item) => item.id === product.id);
+        const existingProduct = shoppingCart.find((item) => item.product_id === product.product_id);
 
         if (existingProduct) {
-            if (existingProduct.cartQuantity < product.quantity) {
+            if (existingProduct.cartQuantity < product.stock) {
                 // Increment quantity if product is already in cart
                 dispatch(setShoppingCart(shoppingCart.map(item =>
                     item.id === product.id ? { ...item, cartQuantity: item.cartQuantity + 1 } : item
@@ -100,13 +120,26 @@ const ProductCardList = () => {
         }
     };
 
+    const location = useLocation();
+
+    const isProductsPage = location.pathname === '/products';
+
     return (
         <div style={{ padding: '20px' }}>
+            {isProductsPage && (
+                <div style={{ marginBottom: '20px', fontSize: '16px' }}>
+                    {searchKey && (
+                        <span style={{ fontWeight: 'bold' }}>
+                            Search results for "{searchKey}"
+                        </span>
+                    )}
+                </div>
+            )}
             <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: '20px' }}>
                 <h2 style={{ textAlign: 'left', textTransform: 'uppercase', fontSize: '24px', margin: 0 }}>
                     Products
                 </h2>
-                <div>
+                {!isProductsPage && (<div>
                     {subCategories?.map((subCategory) => {
                         return (
                             <span
@@ -124,7 +157,13 @@ const ProductCardList = () => {
                         )
                     })}
                 </div>
+                )}
             </div>
+            {error && (
+                <div style={{ color: 'red', fontWeight: 'bold', marginBottom: '20px' }}>
+                    {error}
+                </div>
+            )}
             <Row xs={2} md={3} lg={5} className="g-3">
                 {products.map((product) => (
                     <Col key={product.id} className="d-flex justify-content-center">

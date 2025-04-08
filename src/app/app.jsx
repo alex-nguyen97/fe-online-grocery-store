@@ -1,22 +1,17 @@
 import React from 'react';
 import './app.css'
-import MenuBar from './pages/menu-bar';
-import CategoriesList from './pages/category-list';
-import ProductCardList from './pages/product-card-list';
-import ShoppingCart from './pages/shopping-cart';
-import DeliveryDetail from './pages/delivery-detail';
+
+import HomePage from './pages/homepage';
+import { Routes, Route } from 'react-router-dom';
+import ProductPage from './pages/product-page';
 
 function App() {
   return (
-    <div>
-      <MenuBar />
-      <CategoriesList />
-      <ProductCardList />
-      <ShoppingCart />
-      <DeliveryDetail />
-    </div>
-
-  )
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/products" element={<ProductPage />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;

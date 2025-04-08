@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { categories } from './pages/category-data';
+import { categories } from './containers/category-data';
 export const defaultSubCategory = { sub_category_name: 'All' };
 
 const initialState = {

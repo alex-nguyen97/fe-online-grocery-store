@@ -20,6 +20,7 @@ const MenuBar = () => {
   };
 
   const dispatch = useDispatch();
+
   const handleOpenShoppingCart = () => {
     dispatch(setShoppingCartToggle(true));
   }

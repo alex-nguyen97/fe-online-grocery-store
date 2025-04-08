@@ -34,7 +34,9 @@ const ShoppingCart = () => {
         setCart(newCart);
     };
 
-    const totalPrice = shoppingCart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const totalPrice = shoppingCart.reduce((acc, item) => {
+        return acc + parseFloat(item.price) * item.cartQuantity;
+    }, 0);
 
     const dispatch = useDispatch();
     const handleCloseShoppingCart = () => {
@@ -79,7 +81,7 @@ const ShoppingCart = () => {
                                     return (
                                         <tr key={index}>
                                             <td>{item.name}</td>
-                                            <td>${item.price.toFixed(2)}</td>
+                                            <td>${item.price}</td>
                                             <td>
                                                 <input
                                                     style={{ width: '60px', textAlign: 'center' }}
