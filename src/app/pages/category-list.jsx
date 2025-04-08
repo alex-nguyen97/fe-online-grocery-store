@@ -3,8 +3,9 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSelectedCategory, setCategories } from '../storeSlice';
+import { setSelectedCategory, setCategories, setSelectedSubCategory } from '../storeSlice';
 import api from '../../api';
+import { defaultSubCategory } from '../storeSlice';
 
 function CategoriesList() {
 
@@ -51,12 +52,13 @@ function CategoriesList() {
 
   const handleSelectCategory = (category) => {
     dispatch(setSelectedCategory(category));
+    dispatch(setSelectedSubCategory(defaultSubCategory));
   };
 
   const getCardStyle = (category) => {
     return ({
-      opacity: selectedCategory.name === category.name ? 1 : 0.7,
-      boxShadow: selectedCategory.name === category.name ? "0 0 10px rgba(0, 123, 255, 0.5)" : "none",
+      opacity: selectedCategory.category_name === category.category_name ? 1 : 0.7,
+      boxShadow: selectedCategory.category_name === category.category_name ? "0 0 10px rgba(0, 123, 255, 0.5)" : "none",
     });
   }
 
@@ -64,11 +66,13 @@ function CategoriesList() {
     // Make the API call using the global api instance
     api.get('/categories')
       .then((response) => {
-        console.log(response.data);
         dispatch(setCategories(response.data));
+        if (response.data.length > 0) {
+          dispatch(setSelectedCategory(response.data[0]));
+        }
       })
       .catch((error) => {
-        setError('Error fetching categories.');
+        // setError('Error fetching categories.');
       });
   }, []);
 

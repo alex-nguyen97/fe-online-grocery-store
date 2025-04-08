@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { categories } from './pages/category-data';
-export const defaultSubCategory = { name: 'All' };
+export const defaultSubCategory = { sub_category_name: 'All' };
 
 const initialState = {
     categories: [],
     selectedCategory: {},
     selectedSubcategory: defaultSubCategory,
+    products: [],
     isShoppingCartOpen: false,
     isDeliveryDetailOpen: false,
     shoppingCart: [],
@@ -32,9 +33,20 @@ const storeSlice = createSlice({
         },
         setDeliveryDetailToggle: (state, action) => {
             state.isDeliveryDetailOpen = action.payload;
+        },
+        setProducts: (state, action) => {
+            state.products = action.payload;
         }
     }
 });
 
-export const { setCategories, setSelectedCategory, setSelectedSubCategory, setShoppingCartToggle, setShoppingCart, setDeliveryDetailToggle } = storeSlice.actions;
+export const {
+    setCategories,
+    setSelectedCategory,
+    setSelectedSubCategory,
+    setShoppingCartToggle,
+    setShoppingCart,
+    setDeliveryDetailToggle,
+    setProducts,
+} = storeSlice.actions;
 export default storeSlice.reducer;

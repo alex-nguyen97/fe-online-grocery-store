@@ -1,29 +1,20 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import { Card, Button, Row, Col } from "react-bootstrap";
 import { useSelector, useDispatch } from 'react-redux';
-import VegetablesImage from '../../assets/vegetables.jpg';
-import { defaultSubCategory, setSelectedSubCategory, setShoppingCart } from "../storeSlice";
+import { defaultSubCategory, setProducts, setSelectedSubCategory, setShoppingCart } from "../storeSlice";
 import ToastNotification from "./toast-notification";
-
-const products = [
-    { id: 1, name: "Product 1", price: 10, image: VegetablesImage, quantity: 5 },
-    { id: 2, name: "Product 2", price: 20, image: VegetablesImage, quantity: 8 },
-    { id: 3, name: "Product 3", price: 30, image: VegetablesImage, quantity: 2 },
-    { id: 4, name: "Product 4", price: 40, image: VegetablesImage, quantity: 7 },
-    { id: 5, name: "Product 5", price: 50, image: VegetablesImage, quantity: 3 },
-    { id: 6, name: "Product 6", price: 60, image: VegetablesImage, quantity: 9 },
-    { id: 7, name: "Product 7", price: 70, image: VegetablesImage, quantity: 4 },
-    { id: 8, name: "Product 8", price: 80, image: VegetablesImage, quantity: 0 }, // Out of stock product
-];
+import api from "../../api";
 
 const ProductCardList = () => {
 
     // Add all as a default subcategory
-    const subCategories = useSelector((state) => {
-        const selectedCategory = state.store.selectedCategory;
-        const subCategoryList = selectedCategory ? selectedCategory.subcategories : [];
-        return selectedCategory ? [defaultSubCategory, ...subCategoryList] : [defaultSubCategory];
+
+    const selectedCategory = useSelector((state) => {
+        return state.store.selectedCategory;
     });
+
+    const subCategoryList = selectedCategory ? selectedCategory.subcategories : [];
+    const subCategories = subCategoryList ? [defaultSubCategory, ...subCategoryList] : [defaultSubCategory];
 
     const selectedSubCategory = useSelector((state) => {
         return state.store.selectedSubcategory;
@@ -43,6 +34,34 @@ const ProductCardList = () => {
         message: "Product added to cart!",
         showToast: false,
         background: "success",
+    });
+
+    useEffect(() => {
+        // Make the API call using the global api instance
+        let params = {}
+        if (selectedSubCategory === defaultSubCategory) {
+            params = {
+                category: selectedCategory.category_id,
+            }
+        }
+        else {
+            params = {
+                sub_category: selectedSubCategory.sub_category_id,
+            }
+        }
+        api.get('/products', {
+            params: params
+        })
+            .then((response) => {
+                dispatch(setProducts(response.data));
+            })
+            .catch((error) => {
+                // setError('Error fetching products.');
+            });
+    }, [selectedCategory, selectedSubCategory]);
+
+    const products = useSelector((state) => {
+        return state.store.products;
     });
 
     const handleAddToCart = (product) => {
@@ -79,7 +98,6 @@ const ProductCardList = () => {
                 background: "success",
             });
         }
-
     };
 
     return (
@@ -92,16 +110,16 @@ const ProductCardList = () => {
                     {subCategories?.map((subCategory) => {
                         return (
                             <span
-                                key={subCategory.name}
+                                key={subCategory.sub_category_name}
                                 onClick={() => handleSelectSubCategory(subCategory)}
                                 style={{
                                     cursor: "pointer",
                                     marginLeft: "15px",
                                     fontSize: "16px",
-                                    color: selectedSubCategory?.name === subCategory.name ? "green" : "black",
+                                    color: selectedSubCategory?.sub_category_name === subCategory.sub_category_name ? "green" : "black",
                                 }}
                             >
-                                {subCategory.name}
+                                {subCategory.sub_category_name}
                             </span>
                         )
                     })}
@@ -114,15 +132,19 @@ const ProductCardList = () => {
                             <Card.Img
                                 variant="top"
                                 src={product.image}
-                                style={{ height: "350px", objectFit: "cover" }}
+                                style={{ height: "350px", objectFit: "cover", padding: "30px" }}
                             />
                             <Card.Body className="p-2">
-                                <Card.Title>{product.name}</Card.Title>
-                                <Card.Text style={{ marginBottom: '5px' }}>Price: {product.price}</Card.Text>
+                                <Card.Title style={{
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}>{product.name}</Card.Title>
+                                <Card.Text style={{ marginBottom: '5px' }}>Price: {product.price}$</Card.Text>
                                 {product.quantity === 0 ? (
                                     <Card.Text style={{ color: 'red', fontWeight: 'bold' }}>Out of Stock</Card.Text>
                                 ) : (
-                                    <Card.Text>Quantity: {product.quantity}</Card.Text>
+                                    <Card.Text>Quantity: {product.stock}</Card.Text>
                                 )}
                                 <Button
                                     variant={product.quantity === 0 ? "secondary" : "primary"}
