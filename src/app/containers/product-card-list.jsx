@@ -5,11 +5,10 @@ import { defaultSubCategory, setProducts, setSelectedSubCategory, setShoppingCar
 import ToastNotification from "./toast-notification";
 import api from "../../api";
 import { useLocation, useSearchParams } from "react-router-dom";
+import ConfirmModal from "./confirm-modal";
 
 const ProductCardList = () => {
-
     // Add all as a default subcategory
-
     const selectedCategory = useSelector((state) => {
         return state.store.selectedCategory;
     });
@@ -121,7 +120,6 @@ const ProductCardList = () => {
     };
 
     const location = useLocation();
-
     const isProductsPage = location.pathname === '/products';
 
     return (
@@ -180,15 +178,15 @@ const ProductCardList = () => {
                                     textOverflow: 'ellipsis'
                                 }}>{product.name}</Card.Title>
                                 <Card.Text style={{ marginBottom: '5px' }}>Price: {product.price}$</Card.Text>
-                                {product.quantity === 0 ? (
+                                {product.stock === 0 ? (
                                     <Card.Text style={{ color: 'red', fontWeight: 'bold' }}>Out of Stock</Card.Text>
                                 ) : (
                                     <Card.Text>Quantity: {product.stock}</Card.Text>
                                 )}
                                 <Button
-                                    variant={product.quantity === 0 ? "secondary" : "primary"}
+                                    variant={product.stock === 0 ? "secondary" : "primary"}
                                     size="sm"
-                                    disabled={product.quantity === 0}
+                                    disabled={product.stock === 0}
                                     onClick={() => handleAddToCart(product)}
                                 >
                                     Add to Cart

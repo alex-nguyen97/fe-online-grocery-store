@@ -20,9 +20,15 @@ button:disabled {
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
+}
   
-  .category-card:hover {
+.category-card:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
+}
+
+.custom-modal {
+    min-width: 1000px;
+    width: 100%;
+    max-width: 1200px;
+}
