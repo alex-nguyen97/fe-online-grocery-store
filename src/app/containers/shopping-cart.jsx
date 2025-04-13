@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
 import { useSelector, useDispatch } from 'react-redux';
 import { setDeliveryDetailToggle, setShoppingCart, setShoppingCartToggle } from "../storeSlice";
@@ -8,20 +8,17 @@ import ConfirmModal from "./confirm-modal";
 const ShoppingCart = () => {
     const shoppingCart = useSelector((state) => { return state.store.shoppingCart });
     const isShoppingCartOpen = useSelector((state) => { return state.store.isShoppingCartOpen });
-    // useEffect(() => {
-    //     const savedCart = JSON.parse(localStorage.getItem("shoppingCart"));
-    //     if (savedCart) {
-    //         setCart(savedCart);
-    //     }
-    // }, []);
 
-    // useEffect(() => {
-    //     localStorage.setItem("shoppingCart", JSON.stringify(cart));
-    //     const timeout = setTimeout(() => {
-    //         localStorage.removeItem("shoppingCart");
-    //     }, 20 * 60 * 1000); // 20 minutes
-    //     return () => clearTimeout(timeout);
-    // }, [cart]);
+    useEffect(() => {
+        const localStorageCart = localStorage.getItem("shoppingCart");
+        if (localStorageCart) {
+            dispatch(setShoppingCart(JSON.parse(localStorageCart)));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem("shoppingCart", JSON.stringify(shoppingCart));
+    }, [shoppingCart]);
 
     const updateQuantity = (index, quantity) => {
         const currentProduct = shoppingCart[index];

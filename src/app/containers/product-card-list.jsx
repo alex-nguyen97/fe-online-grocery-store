@@ -45,7 +45,6 @@ const ProductCardList = () => {
         // Make the API call using the global api instance
         let params = {}
         if (searchKey) {
-            console.log("searchKey", searchKey);
             params = {
                 search: searchKey,
             }
@@ -164,8 +163,8 @@ const ProductCardList = () => {
             )}
             <Row xs={2} md={3} lg={5} className="g-3">
                 {products.map((product) => (
-                    <Col key={product.id} className="d-flex justify-content-center">
-                        <Card className="card-hover" style={{ width: "100%", maxWidth: "350px" }}>
+                    <Col key={`product-col-${product.product_id}`} className="d-flex justify-content-center">
+                        <Card key={product.product_id} className="card-hover" style={{ width: "100%", maxWidth: "350px" }}>
                             <Card.Img
                                 variant="top"
                                 src={product.image}

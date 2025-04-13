@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Modal, Form, Button } from 'react-bootstrap';
+import { Modal, Form, Button, Container } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { setDeliveryDetailToggle, setShoppingCart, setShoppingCartToggle } from '../storeSlice';
 import ToastNotification from './toast-notification';
-
+import api from '../../api';
+import LoadingModal from './loading-modal';
 const DeliveryDetail = () => {
-
     const [formData, setFormData] = useState({
         recipientName: '',
         address: '',
@@ -58,28 +58,68 @@ const DeliveryDetail = () => {
     };
 
     const [toast, setToast] = useState({
-        show: false,
+        showToast: false,
         message: '',
         background: 'success',
     });
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const shoppingCart = useSelector((state) => {
+        return state.store.shoppingCart;
+    });
 
+    const [showLoading, setShowLoading] = useState(false);
+    const handleSubmit = (e) => {
+        setShowLoading(true);
+        e.preventDefault();
+        const { recipientName, address, city, state, mobileNumber, email } = formData;
+
+        const totalPrice = shoppingCart.reduce((total, item) => total + (item.price * item.cartQuantity), 0);
+        const products = shoppingCart.map(item => ({
+            product_id: item.product_id,
+            quantity: item.cartQuantity,
+        }));
+        const orderData = {
+            delivery: {
+                recipient_name: recipientName,
+                address_street: address,
+                city_suburb: city,
+                state_territory: state,
+                mobile_number: mobileNumber,
+                email: email,
+            },
+            order: {
+                user_id: 1, // Set this default as we don't have user authentication yet
+                status: 'pending', // Default status
+                payment_method: 'credit_card',  // Default payment method
+                total_price: totalPrice,
+            },
+            products: products,
+        };
         if (validateForm()) {
-            setToast({
-                show: true,
-                message: "Order confirmed! A confirmation email has been sent.",
-                background: 'success',
-            });
-            dispatch(setShoppingCart([])); // Clear the shopping cart
-            dispatch(setDeliveryDetailToggle(false)); // Close the modal
-        } else {
-            setToast({
-                show: true,
-                message: "Order submission failed! Please check your details.",
-                background: 'danger',
-            });
+            api.post('/orders/create', orderData)
+                .then(() => {
+                    setToast({
+                        showToast: true,
+                        message: "Order confirmed! A confirmation email has been sent.",
+                        background: 'success',
+                    });
+                    dispatch(setShoppingCart([])); // Clear the shopping cart
+                    dispatch(setDeliveryDetailToggle(false)); // Close the modal
+                    setTimeout(() => {
+                        setShowLoading(false);
+                        window.location.href = '/';
+                    }, 2000);
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        setShowLoading(false);
+                        setToast({
+                            showToast: true,
+                            message: "Error: " + error.response.data.message,
+                            background: 'danger',
+                        });
+                    }
+                });
         }
     };
 
@@ -110,128 +150,139 @@ const DeliveryDetail = () => {
     ];
 
     return (
-        <Modal show={showModal} onHide={handleCloseModal}>
-            <Form onSubmit={handleSubmit} noValidate>
-                <Modal.Header closeButton>
-                    <Modal.Title>Delivery Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form.Group controlId="recipientName">
-                        <Form.Label>Recipient's Name</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="recipientName"
-                            value={formData.recipientName}
-                            onChange={handleChange}
-                            isInvalid={!!errors.recipientName}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.recipientName}
-                        </Form.Control.Feedback>
-                    </Form.Group>
+        <Container>
 
-                    <Form.Group controlId="address">
-                        <Form.Label>Street Address</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            isInvalid={!!errors.address}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.address}
-                        </Form.Control.Feedback>
-                    </Form.Group>
 
-                    <Form.Group controlId="city">
-                        <Form.Label>City/Suburb</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="city"
-                            value={formData.city}
-                            onChange={handleChange}
-                            isInvalid={!!errors.city}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.city}
-                        </Form.Control.Feedback>
-                    </Form.Group>
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Form onSubmit={handleSubmit} noValidate>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delivery Details</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group controlId="recipientName">
+                            <Form.Label>Recipient's Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="recipientName"
+                                value={formData.recipientName}
+                                onChange={handleChange}
+                                isInvalid={!!errors.recipientName}
+                                required
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.recipientName}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
-                    <Form.Group controlId="state">
-                        <Form.Label>State/Territory</Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="state"
-                            value={formData.state}
-                            onChange={handleChange}
-                            isInvalid={!!errors.state}
-                            required
-                        >
-                            {states.map((state) => (
-                                <option key={state.value} value={state.value}>
-                                    {state.label}
-                                </option>
-                            ))}
-                        </Form.Control>
-                        <Form.Control.Feedback type="invalid">
-                            {errors.state}
-                        </Form.Control.Feedback>
-                    </Form.Group>
+                        <Form.Group controlId="address">
+                            <Form.Label>Street Address</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="address"
+                                value={formData.address}
+                                onChange={handleChange}
+                                isInvalid={!!errors.address}
+                                required
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.address}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
-                    <Form.Group controlId="mobileNumber">
-                        <Form.Label>Mobile Number</Form.Label>
-                        <Form.Control
-                            type="tel"
-                            name="mobileNumber"
-                            value={formData.mobileNumber}
-                            onChange={handleChange}
-                            isInvalid={!!errors.mobileNumber}
-                            required
-                            placeholder="e.g. 0412345678"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.mobileNumber}
-                        </Form.Control.Feedback>
-                    </Form.Group>
+                        <Form.Group controlId="city">
+                            <Form.Label>City/Suburb</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="city"
+                                value={formData.city}
+                                onChange={handleChange}
+                                isInvalid={!!errors.city}
+                                required
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.city}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
-                    <Form.Group controlId="email">
-                        <Form.Label>Email Address</Form.Label>
-                        <Form.Control
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            isInvalid={!!errors.email}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.email}
-                        </Form.Control.Feedback>
-                    </Form.Group>
+                        <Form.Group controlId="state">
+                            <Form.Label>State/Territory</Form.Label>
+                            <Form.Control
+                                as="select"
+                                name="state"
+                                value={formData.state}
+                                onChange={handleChange}
+                                isInvalid={!!errors.state}
+                                required
+                            >
+                                {states.map((state) => (
+                                    <option key={state.value} value={state.value}>
+                                        {state.label}
+                                    </option>
+                                ))}
+                            </Form.Control>
+                            <Form.Control.Feedback type="invalid">
+                                {errors.state}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
-                </Modal.Body>
+                        <Form.Group controlId="mobileNumber">
+                            <Form.Label>Mobile Number</Form.Label>
+                            <Form.Control
+                                type="tel"
+                                name="mobileNumber"
+                                value={formData.mobileNumber}
+                                onChange={handleChange}
+                                isInvalid={!!errors.mobileNumber}
+                                required
+                                placeholder="e.g. 0412345678"
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.mobileNumber}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => { }}>Close</Button>
-                    <Button variant="warning" onClick={() => handleBackToCart()}>Back to Cart</Button>
-                    <Button variant="success" type="submit">
-                        Submit Order
-                    </Button>
-                </Modal.Footer>
-            </Form>
+                        <Form.Group controlId="email">
+                            <Form.Label>Email Address</Form.Label>
+                            <Form.Control
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                isInvalid={!!errors.email}
+                                required
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.email}
+                            </Form.Control.Feedback>
+                        </Form.Group>
 
+                    </Modal.Body>
+
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => { }}>Close</Button>
+                        <Button variant="warning" onClick={() => handleBackToCart()}>Back to Cart</Button>
+                        <Button variant="success" type="submit">
+                            Submit Order
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+
+
+            </Modal>
             <ToastNotification
                 message={toast.message}
-                showToast={toast.show}
+                showToast={toast.showToast}
                 background={toast.background}
                 position="bottom-end"
-                onClose={() => setShowToast(false)}
+                onClose={() => setToast(
+                    {
+                        ...toast,
+                        showToast: false
+                    }
+                )}
             />
-        </Modal>
+            <LoadingModal show={showLoading} />
+        </Container>
     );
 };
 
