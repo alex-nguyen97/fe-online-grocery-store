@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Modal, Form, Button, Container } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { setDeliveryDetailToggle, setShoppingCart, setShoppingCartToggle } from '../storeSlice';
+import { setDeliveryDetailToggle, setProducts, setShoppingCart, setShoppingCartToggle } from '../storeSlice';
 import ToastNotification from './toast-notification';
 import api from '../../api';
 import LoadingModal from './loading-modal';
+
 const DeliveryDetail = () => {
     const [formData, setFormData] = useState({
         recipientName: '',
@@ -67,14 +68,17 @@ const DeliveryDetail = () => {
         return state.store.shoppingCart;
     });
 
+    const allProducts = useSelector((state) => {
+        return state.store.products;
+    });
+
     const [showLoading, setShowLoading] = useState(false);
     const handleSubmit = (e) => {
-        setShowLoading(true);
         e.preventDefault();
         const { recipientName, address, city, state, mobileNumber, email } = formData;
 
         const totalPrice = shoppingCart.reduce((total, item) => total + (item.price * item.cartQuantity), 0);
-        const products = shoppingCart.map(item => ({
+        const cartProducts = shoppingCart.map(item => ({
             product_id: item.product_id,
             quantity: item.cartQuantity,
         }));
@@ -93,11 +97,13 @@ const DeliveryDetail = () => {
                 payment_method: 'credit_card',  // Default payment method
                 total_price: totalPrice,
             },
-            products: products,
+            products: cartProducts,
         };
         if (validateForm()) {
+            setShowLoading(true);
             api.post('/orders/create', orderData)
-                .then(() => {
+                .then((response) => {
+                    setShowLoading(false);
                     setToast({
                         showToast: true,
                         message: "Order confirmed! A confirmation email has been sent.",
@@ -105,10 +111,17 @@ const DeliveryDetail = () => {
                     });
                     dispatch(setShoppingCart([])); // Clear the shopping cart
                     dispatch(setDeliveryDetailToggle(false)); // Close the modal
-                    setTimeout(() => {
-                        setShowLoading(false);
-                        window.location.href = '/';
-                    }, 2000);
+                    const updatedProducts = response.data.data.products;
+                    // Create a map for quick lookup
+                    const updatedMap = new Map(updatedProducts.map(p => [p.product_id, p]));
+
+                    // Create a new list with updates applied
+                    const newProducts = allProducts.map(product =>
+                        updatedMap.has(product.product_id)
+                            ? { ...product, ...updatedMap.get(product.product_id) } // merge updates
+                            : product
+                    );
+                    dispatch(setProducts(newProducts));
                 })
                 .catch((error) => {
                     if (error.response) {
