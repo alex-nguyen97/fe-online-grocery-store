@@ -92,7 +92,7 @@ const ProductCardList = () => {
             if (existingProduct.cartQuantity < product.stock) {
                 // Increment quantity if product is already in cart
                 dispatch(setShoppingCart(shoppingCart.map(item =>
-                    item.id === product.id ? { ...item, cartQuantity: item.cartQuantity + 1 } : item
+                    item.product_id === product.product_id ? { ...item, cartQuantity: item.cartQuantity + 1 } : item
                 )));
                 setToast({
                     message: "Product quantity updated in cart!",
